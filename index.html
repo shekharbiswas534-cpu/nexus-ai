@@ -24,7 +24,7 @@
     <div class="flex-1 flex flex-col h-full border-r border-slate-800">
       <div id="chatBox" class="flex-1 overflow-y-auto p-4 space-y-4">
         <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 text-sm max-w-[85%]">
-          👋 Namaste! Main aapka <b>Nexus AI Builder</b> hoon. Apna koi bhi naya AI idea, feature ya code ki requirement yahan batayein!
+          👋 Namaste! Main aapka <b>Nexus AI Builder</b> hoon. Apna idea likhein aur live code generate karwayein!
         </div>
       </div>
 
@@ -32,7 +32,7 @@
       <div class="p-3 bg-slate-900 border-t border-slate-800">
         <div class="flex gap-2">
           <textarea id="userInput" rows="2" placeholder="Apna idea likhein... (Hinglish/Hindi/English)" class="flex-1 bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-sm focus:outline-none focus:border-blue-500 resize-none"></textarea>
-          <button onclick="sendMessage()" class="bg-blue-600 hover:bg-blue-500 px-4 rounded-xl font-medium text-sm transition">Send</button>
+          <button id="sendBtn" onclick="sendMessage()" class="bg-blue-600 hover:bg-blue-500 px-4 rounded-xl font-medium text-sm transition">Send</button>
         </div>
       </div>
     </div>
@@ -53,7 +53,7 @@
 
     function setApiKey() {
       const key = prompt("Apni Gemini API Key paste karein:", geminiKey);
-      if (key) {
+      if (key !== null) {
         geminiKey = key.trim();
         localStorage.setItem('GEMINI_KEY', geminiKey);
         alert("API Key save ho gayi!");
@@ -62,31 +62,50 @@
 
     async function sendMessage() {
       const input = document.getElementById('userInput');
+      const sendBtn = document.getElementById('sendBtn');
       const text = input.value.trim();
       if (!text) return;
 
       if (!geminiKey) {
-        alert("Pehle upar diye 'Set API Key' button se apni key dalein!");
+        alert("Pehle upar diye 'Set API Key' button se apni key daalein!");
         return;
       }
 
       appendMessage(text, 'user');
       input.value = '';
+      sendBtn.disabled = true;
+      sendBtn.innerText = '...';
 
       try {
-        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`, {
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiKey}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            systemInstruction: { parts: [{ text: "You are Nexus Builder, an expert AI Software Architect. Help build systems, provide step-by-step plans and runnable code. Communicate in Hinglish/Hindi/English naturally." }] },
-            contents: [{ parts: [{ text: text }] }]
+            contents: [{
+              parts: [{
+                text: "You are Nexus Builder, an expert AI coder. Help the user build projects. If code is requested, provide working, single-file HTML/CSS/JS code. User prompt: " + text
+              }]
+            }]
           })
         });
+
         const data = await res.json();
-        const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "Maaf kijiye, response nahi mila.";
-        appendMessage(reply, 'bot');
+
+        if (data.error) {
+          appendMessage("API Error: " + data.error.message, 'bot');
+        } else {
+          const reply = data.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (reply) {
+            appendMessage(reply, 'bot');
+          } else {
+            appendMessage("Response empty aaya. Ek baar API key check karein.", 'bot');
+          }
+        }
       } catch (err) {
-        appendMessage("Error aagaya: " + err.message, 'bot');
+        appendMessage("Network Error: " + err.message, 'bot');
+      } finally {
+        sendBtn.disabled = false;
+        sendBtn.innerText = 'Send';
       }
     }
 
