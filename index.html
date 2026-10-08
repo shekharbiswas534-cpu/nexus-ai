@@ -24,7 +24,7 @@
     <div class="flex-1 flex flex-col h-full border-r border-slate-800">
       <div id="chatBox" class="flex-1 overflow-y-auto p-4 space-y-4">
         <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 text-sm max-w-[85%]">
-          👋 Namaste! Main aapka <b>Nexus AI Builder</b> hoon. Apna idea likhein aur live code generate karwayein!
+          👋 Namaste! Main aapka <b>Nexus AI Builder</b> hoon. Apna idea likhein aur code banwayein!
         </div>
       </div>
 
@@ -77,13 +77,13 @@
       sendBtn.innerText = '...';
 
       try {
-        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiKey}`, {
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${geminiKey}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             contents: [{
               parts: [{
-                text: "You are Nexus Builder, an expert AI coder. Help the user build projects. If code is requested, provide working, single-file HTML/CSS/JS code. User prompt: " + text
+                text: "You are Nexus Builder, an expert AI software developer. Communicate naturally in Hinglish/Hindi/English. When asked to create apps or tools, provide clean, runnable HTML/CSS/JS code blocks: " + text
               }]
             }]
           })
@@ -98,7 +98,7 @@
           if (reply) {
             appendMessage(reply, 'bot');
           } else {
-            appendMessage("Response empty aaya. Ek baar API key check karein.", 'bot');
+            appendMessage("Koi response generate nahi hua.", 'bot');
           }
         }
       } catch (err) {
