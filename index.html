@@ -3,53 +3,202 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nexus Builder AI</title>
+  <title>Nexus AI Builder Pro</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="bg-slate-950 text-slate-100 flex flex-col h-screen font-sans">
 
   <!-- Header -->
-  <header class="p-3 border-b border-slate-800 flex justify-between items-center bg-slate-900">
+  <header class="p-3 border-b border-slate-800 flex justify-between items-center bg-slate-900 shadow-md">
     <div class="flex items-center gap-2">
-      <span class="text-xl font-bold bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">Nexus AI Builder</span>
+      <!-- Toggle Sidebar Button (Mobile & Desktop) -->
+      <button onclick="toggleSidebar()" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+      <span class="text-lg md:text-xl font-extrabold bg-gradient-to-r from-blue-400 via-indigo-300 to-purple-500 bg-clip-text text-transparent">
+        Nexus AI Builder
+      </span>
     </div>
-    <button onclick="setApiKey()" class="text-xs bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg border border-slate-700">
-      🔑 Set API Key
-    </button>
+    <div class="flex items-center gap-2">
+      <button onclick="downloadCode()" class="text-xs bg-slate-800 hover:bg-slate-700 px-2.5 py-1.5 rounded-lg border border-slate-700 flex items-center gap-1">
+        <i class="fa-solid fa-download"></i> Save File
+      </button>
+      <button onclick="setApiKey()" class="text-xs bg-blue-600 hover:bg-blue-500 px-3 py-1.5 rounded-lg font-medium shadow">
+        🔑 API Key
+      </button>
+    </div>
   </header>
 
-  <!-- Main View -->
-  <div class="flex-1 flex flex-col md:flex-row overflow-hidden">
-    <!-- Chat Section -->
-    <div class="flex-1 flex flex-col h-full border-r border-slate-800">
-      <div id="chatBox" class="flex-1 overflow-y-auto p-4 space-y-4">
-        <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 text-sm max-w-[85%]">
-          👋 Namaste! Main aapka <b>Nexus AI Builder</b> hoon. Apna koi bhi software idea batayein!
+  <!-- Main Container -->
+  <div class="flex-1 flex overflow-hidden relative">
+
+    <!-- History Sidebar (Gemini Style) -->
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-64 bg-slate-900 border-r border-slate-800 flex flex-col transform -translate-x-full transition-transform duration-200 ease-in-out md:relative md:translate-x-0">
+      <div class="p-3 border-b border-slate-800 flex justify-between items-center">
+        <button onclick="startNewChat()" class="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold py-2 px-3 rounded-lg shadow">
+          <i class="fa-solid fa-plus"></i> New Chat
+        </button>
+        <button onclick="toggleSidebar()" class="md:hidden ml-2 p-1.5 text-slate-400 hover:text-white">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Saved Chats List -->
+      <div class="flex-1 overflow-y-auto p-2 space-y-1.5" id="chatHistoryList">
+        <!-- Rendered Dynamically -->
+      </div>
+
+      <div class="p-2 border-t border-slate-800">
+        <button onclick="clearAllHistory()" class="w-full text-xs text-rose-400 hover:text-rose-300 py-1.5 rounded flex items-center justify-center gap-1">
+          <i class="fa-solid fa-trash"></i> Clear All History
+        </button>
+      </div>
+    </aside>
+
+    <!-- Chat & Live Sandbox Grid -->
+    <div class="flex-1 flex flex-col md:flex-row overflow-hidden w-full">
+      
+      <!-- Chat Interface -->
+      <div class="flex-1 flex flex-col h-1/2 md:h-full border-r border-slate-800 bg-slate-950">
+        <div id="chatBox" class="flex-1 overflow-y-auto p-4 space-y-4">
+          <!-- Messages will appear here -->
+        </div>
+
+        <!-- Input Box -->
+        <div class="p-3 bg-slate-900 border-t border-slate-800">
+          <div class="flex gap-2">
+            <textarea id="userInput" rows="2" placeholder="Apna idea ya sawal likhein..." class="flex-1 bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-sm focus:outline-none focus:border-blue-500 resize-none"></textarea>
+            <button id="sendBtn" onclick="sendMessage()" class="bg-blue-600 hover:bg-blue-500 px-4 rounded-xl font-medium text-sm transition">Send</button>
+          </div>
         </div>
       </div>
 
-      <!-- Input Area -->
-      <div class="p-3 bg-slate-900 border-t border-slate-800">
-        <div class="flex gap-2">
-          <textarea id="userInput" rows="2" placeholder="Apna idea likhein... (Hinglish/Hindi/English)" class="flex-1 bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-sm focus:outline-none focus:border-blue-500 resize-none"></textarea>
-          <button id="sendBtn" onclick="sendMessage()" class="bg-blue-600 hover:bg-blue-500 px-4 rounded-xl font-medium text-sm transition">Send</button>
+      <!-- Sandbox / Live Preview Area -->
+      <div class="flex-1 flex flex-col h-1/2 md:h-full bg-slate-900 border-t md:border-t-0 border-slate-800">
+        <div class="p-2 border-b border-slate-800 flex justify-between items-center bg-slate-950 px-3">
+          <span class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Live Code Sandbox</span>
+          <button onclick="runCode()" class="text-xs bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-3 py-1 rounded">
+            ▶ Run Code
+          </button>
         </div>
+        <textarea id="codeEditor" class="h-1/3 bg-slate-950 p-2.5 text-xs font-mono text-emerald-400 border-none outline-none resize-none" placeholder="Generated HTML code yahan aayega..."></textarea>
+        <iframe id="previewFrame" class="flex-1 w-full bg-white border-t border-slate-800"></iframe>
       </div>
-    </div>
 
-    <!-- Code Runner / Sandbox Preview -->
-    <div class="h-1/2 md:h-full md:w-1/2 flex flex-col bg-slate-900 border-t md:border-t-0 border-slate-800">
-      <div class="p-2 border-b border-slate-800 flex justify-between items-center bg-slate-950">
-        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Live Code Sandbox</span>
-        <button onclick="runCode()" class="text-xs bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-3 py-1 rounded">▶ Run Code</button>
-      </div>
-      <textarea id="codeEditor" class="flex-1 bg-slate-950 p-3 text-xs font-mono text-emerald-400 border-none outline-none resize-none" placeholder="Generated HTML/JS code yahan paste karke Run dabayein..."></textarea>
-      <iframe id="previewFrame" class="h-1/2 w-full bg-white border-t border-slate-800"></iframe>
     </div>
   </div>
 
   <script>
     let geminiKey = localStorage.getItem('GEMINI_KEY') || '';
+    let sessions = JSON.parse(localStorage.getItem('NEXUS_SESSIONS') || '[]');
+    let currentSessionId = localStorage.getItem('NEXUS_CURRENT_SESSION') || null;
+
+    function init() {
+      if (sessions.length === 0) {
+        startNewChat();
+      } else {
+        if (!currentSessionId || !sessions.find(s => s.id === currentSessionId)) {
+          currentSessionId = sessions[0].id;
+        }
+        renderSidebar();
+        loadSession(currentSessionId);
+      }
+    }
+
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.classList.toggle('-translate-x-full');
+    }
+
+    function startNewChat() {
+      const newId = 'session_' + Date.now();
+      const newSession = {
+        id: newId,
+        title: 'New Conversation',
+        messages: [{
+          sender: 'bot',
+          text: '👋 Namaste! Main aapka Nexus AI Builder hoon. Apna naya idea ya requirement batayein!'
+        }]
+      };
+      sessions.unshift(newSession);
+      currentSessionId = newId;
+      saveSessions();
+      renderSidebar();
+      loadSession(newId);
+    }
+
+    function saveSessions() {
+      localStorage.setItem('NEXUS_SESSIONS', JSON.stringify(sessions));
+      localStorage.setItem('NEXUS_CURRENT_SESSION', currentSessionId);
+    }
+
+    function renderSidebar() {
+      const container = document.getElementById('chatHistoryList');
+      container.innerHTML = '';
+
+      sessions.forEach(session => {
+        const item = document.createElement('div');
+        const isActive = session.id === currentSessionId;
+        item.className = `p-2 rounded-lg text-xs cursor-pointer flex justify-between items-center group transition ${isActive ? 'bg-blue-600 text-white font-medium' : 'text-slate-300 hover:bg-slate-800'}`;
+        
+        const titleSpan = document.createElement('span');
+        titleSpan.className = 'truncate flex-1 mr-2';
+        titleSpan.innerText = session.title || 'Untitled Chat';
+        titleSpan.onclick = () => {
+          loadSession(session.id);
+          if (window.innerWidth < 768) toggleSidebar();
+        };
+
+        const delBtn = document.createElement('button');
+        delBtn.innerHTML = '<i class="fa-solid fa-trash-can opacity-60 hover:opacity-100"></i>';
+        delBtn.onclick = (e) => {
+          e.stopPropagation();
+          deleteSession(session.id);
+        };
+
+        item.appendChild(titleSpan);
+        item.appendChild(delBtn);
+        container.appendChild(item);
+      });
+    }
+
+    function loadSession(id) {
+      currentSessionId = id;
+      localStorage.setItem('NEXUS_CURRENT_SESSION', currentSessionId);
+      renderSidebar();
+
+      const session = sessions.find(s => s.id === id);
+      const box = document.getElementById('chatBox');
+      box.innerHTML = '';
+
+      if (session) {
+        session.messages.forEach(msg => {
+          appendMessageUI(msg.text, msg.sender);
+        });
+      }
+    }
+
+    function deleteSession(id) {
+      sessions = sessions.filter(s => s.id !== id);
+      if (sessions.length === 0) {
+        startNewChat();
+      } else {
+        if (currentSessionId === id) {
+          currentSessionId = sessions[0].id;
+        }
+        saveSessions();
+        renderSidebar();
+        loadSession(currentSessionId);
+      }
+    }
+
+    function clearAllHistory() {
+      if (confirm("Kya aap saari purani chat history delete karna chahte hain?")) {
+        sessions = [];
+        startNewChat();
+      }
+    }
 
     function setApiKey() {
       const key = prompt("Apni Gemini API Key paste karein:", geminiKey);
@@ -67,20 +216,30 @@
       if (!text) return;
 
       if (!geminiKey) {
-        alert("Pehle upar diye 'Set API Key' button se apni key daalein!");
+        alert("Pehle API Key set karein!");
         return;
       }
 
-      appendMessage(text, 'user');
+      const activeSession = sessions.find(s => s.id === currentSessionId);
+      if (!activeSession) return;
+
+      // Update session title on first user prompt
+      if (activeSession.messages.filter(m => m.sender === 'user').length === 0) {
+        activeSession.title = text.length > 25 ? text.substring(0, 25) + '...' : text;
+        renderSidebar();
+      }
+
+      // Add to session
+      activeSession.messages.push({ sender: 'user', text: text });
+      appendMessageUI(text, 'user');
       input.value = '';
       sendBtn.disabled = true;
-      sendBtn.innerText = 'Bana raha hoon...';
+      sendBtn.innerText = '...';
 
-      // Latest official models priority list
-      const targetModels = ['gemini-3.8-flash', 'gemini-3.5-flash-lite', 'gemini-3.7-flash'];
-      let answered = false;
+      const models = ['gemini-3.8-flash', 'gemini-3.5-flash-lite'];
+      let done = false;
 
-      for (const m of targetModels) {
+      for (const m of models) {
         try {
           const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${geminiKey}`, {
             method: 'POST',
@@ -88,35 +247,39 @@
             body: JSON.stringify({
               contents: [{
                 parts: [{
-                  text: "You are Nexus Builder, an expert programmer. Reply in Hinglish/Hindi naturally. Provide fully working single-page HTML/CSS/JS code when asked for apps: " + text
+                  text: "You are Nexus AI Builder Pro. Respond naturally in Hinglish/Hindi. When asked to code, ALWAYS provide a complete, working, single-file HTML/CSS/JS block enclosed in ```html ... ```. User prompt: " + text
                 }]
               }]
             })
           });
 
           const data = await res.json();
-
           if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
-            appendMessage(data.candidates[0].content.parts[0].text, 'bot');
-            answered = true;
+            const reply = data.candidates[0].content.parts[0].text;
+            activeSession.messages.push({ sender: 'bot', text: reply });
+            saveSessions();
+            appendMessageUI(reply, 'bot');
+            extractAndAutoFillCode(reply);
+            done = true;
             break;
-          } else if (data.error) {
-            console.log(m + " error:", data.error.message);
           }
-        } catch (err) {
-          console.log(err);
+        } catch (e) {
+          console.error(e);
         }
       }
 
-      if (!answered) {
-        appendMessage("Google server traffic busy hai ya key issue hai. Kripya 15 second baad wapas Send karein.", 'bot');
+      if (!done) {
+        const errorMsg = "Google server par load hai ya API issue hai. Kripya thodi der baad try karein.";
+        activeSession.messages.push({ sender: 'bot', text: errorMsg });
+        saveSessions();
+        appendMessageUI(errorMsg, 'bot');
       }
 
       sendBtn.disabled = false;
       sendBtn.innerText = 'Send';
     }
 
-    function appendMessage(text, sender) {
+    function appendMessageUI(text, sender) {
       const box = document.getElementById('chatBox');
       const div = document.createElement('div');
       div.className = sender === 'user' 
@@ -127,6 +290,15 @@
       box.scrollTop = box.scrollHeight;
     }
 
+    function extractAndAutoFillCode(text) {
+      const match = text.match(/```html([\s\S]*?)```/i) || text.match(/```([\s\S]*?)```/);
+      if (match && match[1]) {
+        const cleanCode = match[1].trim();
+        document.getElementById('codeEditor').value = cleanCode;
+        runCode();
+      }
+    }
+
     function runCode() {
       const code = document.getElementById('codeEditor').value;
       const frame = document.getElementById('previewFrame').contentWindow.document;
@@ -134,6 +306,21 @@
       frame.write(code);
       frame.close();
     }
+
+    function downloadCode() {
+      const code = document.getElementById('codeEditor').value;
+      if (!code) {
+        alert("Pehle sandbox mein code generate karein!");
+        return;
+      }
+      const blob = new Blob([code], { type: 'text/html' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'index.html';
+      a.click();
+    }
+
+    window.onload = init;
   </script>
 </body>
 </html>
