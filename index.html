@@ -6,7 +6,6 @@
   <title>Nexus AI Builder Pro</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Google Sign-In SDK -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body class="bg-slate-950 text-slate-100 flex flex-col h-screen font-sans">
@@ -18,20 +17,20 @@
         <i class="fa-solid fa-bars"></i>
       </button>
       <span class="text-base md:text-xl font-extrabold bg-gradient-to-r from-blue-400 via-indigo-300 to-purple-500 bg-clip-text text-transparent">
-        Nexus AI Builder
+        Nexus AI Builder Pro
       </span>
     </div>
 
-    <!-- Header Actions & Auth -->
+    <!-- Actions & Auth -->
     <div class="flex items-center gap-2">
-      <button onclick="openFullscreenModal()" class="text-xs bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-2.5 py-1.5 rounded-lg flex items-center gap-1">
+      <button onclick="openFullscreenModal()" class="text-xs bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-2.5 py-1.5 rounded-lg flex items-center gap-1 shadow">
         <i class="fa-solid fa-expand"></i> <span class="hidden sm:inline">Preview</span>
       </button>
       <button onclick="setApiKey()" class="text-xs bg-slate-800 hover:bg-slate-700 px-2.5 py-1.5 rounded-lg border border-slate-700">
         🔑 Key
       </button>
       
-      <!-- User Profile / Login Area -->
+      <!-- User Profile / Login -->
       <div id="authSection" class="flex items-center gap-1.5">
         <button id="loginPromptBtn" onclick="promptGoogleLogin()" class="text-xs bg-blue-600 hover:bg-blue-500 text-white px-2.5 py-1.5 rounded-lg font-medium flex items-center gap-1">
           <i class="fa-brands fa-google"></i> Login
@@ -70,17 +69,34 @@
       </div>
     </aside>
 
-    <!-- Chat & Live Sandbox Grid -->
+    <!-- Main Workspace -->
     <div class="flex-1 flex flex-col md:flex-row overflow-hidden w-full">
+      
       <!-- Chat Interface -->
       <div class="flex-1 flex flex-col h-1/2 md:h-full border-r border-slate-800 bg-slate-950">
         <div id="chatBox" class="flex-1 overflow-y-auto p-4 space-y-4"></div>
 
-        <!-- Input Box -->
+        <!-- Dynamic Thinking / Status Tracker -->
+        <div id="statusTracker" class="hidden px-4 py-2 bg-slate-900 border-t border-slate-800 flex items-center gap-2 text-xs text-blue-400 font-mono">
+          <i class="fa-solid fa-circle-notch fa-spin"></i>
+          <span id="statusText">Thinking...</span>
+        </div>
+
+        <!-- Input Box & Image Attachment Preview -->
         <div class="p-3 bg-slate-900 border-t border-slate-800">
-          <div class="flex gap-2">
-            <textarea id="userInput" rows="2" placeholder="Apna idea ya sawal likhein..." class="flex-1 bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-sm focus:outline-none focus:border-blue-500 resize-none"></textarea>
-            <button id="sendBtn" onclick="sendMessage()" class="bg-blue-600 hover:bg-blue-500 px-4 rounded-xl font-medium text-sm transition">Send</button>
+          <div id="attachmentPreview" class="hidden mb-2 relative inline-block">
+            <img id="previewImg" class="h-16 w-16 object-cover rounded-lg border border-blue-500 shadow">
+            <button onclick="removeAttachment()" class="absolute -top-1.5 -right-1.5 bg-rose-600 hover:bg-rose-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px]">
+              &times;
+            </button>
+          </div>
+          <div class="flex items-center gap-2">
+            <label class="cursor-pointer bg-slate-800 hover:bg-slate-700 text-slate-300 p-2.5 rounded-xl border border-slate-700 flex items-center justify-center">
+              <i class="fa-solid fa-paperclip"></i>
+              <input type="file" id="mediaUpload" accept="image/*" class="hidden" onchange="handleFileSelect(event)">
+            </label>
+            <textarea id="userInput" rows="2" placeholder="Apna idea, sawal ya requirement likhein..." class="flex-1 bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-sm focus:outline-none focus:border-blue-500 resize-none"></textarea>
+            <button id="sendBtn" onclick="sendMessage()" class="bg-blue-600 hover:bg-blue-500 px-4 py-2.5 rounded-xl font-medium text-sm transition h-full flex items-center justify-center">Send</button>
           </div>
         </div>
       </div>
@@ -98,16 +114,15 @@
             </button>
           </div>
         </div>
-        <textarea id="codeEditor" class="h-1/3 bg-slate-950 p-2.5 text-xs font-mono text-emerald-400 border-none outline-none resize-none" placeholder="HTML code yahan paste karke Run karein..."></textarea>
+        <textarea id="codeEditor" class="h-1/3 bg-slate-950 p-2.5 text-xs font-mono text-emerald-400 border-none outline-none resize-none" placeholder="HTML / App code yahan paste karke Run karein..."></textarea>
         <iframe id="previewFrame" class="flex-1 w-full bg-white border-t border-slate-800"></iframe>
       </div>
     </div>
   </div>
 
-  <!-- Fullscreen Desktop Preview Modal -->
+  <!-- Fullscreen Desktop Preview Modal (With ❌ Button) -->
   <div id="fullscreenModal" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-sm hidden flex flex-col p-2 md:p-6">
     <div class="flex-1 bg-slate-900 border border-slate-700 rounded-2xl flex flex-col overflow-hidden shadow-2xl">
-      <!-- Computer Window Bar -->
       <div class="bg-slate-800 px-4 py-2.5 border-b border-slate-700 flex justify-between items-center select-none">
         <div class="flex items-center gap-2">
           <span class="w-3 h-3 rounded-full bg-rose-500 inline-block"></span>
@@ -121,7 +136,6 @@
           <i class="fa-solid fa-xmark text-sm font-bold"></i>
         </button>
       </div>
-      <!-- Webpage View -->
       <iframe id="modalPreviewFrame" class="w-full flex-1 bg-white border-none"></iframe>
     </div>
   </div>
@@ -131,6 +145,8 @@
     let currentUser = JSON.parse(localStorage.getItem('NEXUS_USER') || 'null');
     let sessions = [];
     let currentSessionId = null;
+    let currentAttachedBase64 = null;
+    let currentAttachedMime = null;
 
     function getStorageKey() {
       return currentUser ? `NEXUS_SESSIONS_${currentUser.email}` : 'NEXUS_SESSIONS_GUEST';
@@ -156,7 +172,7 @@
     }
 
     function promptGoogleLogin() {
-      const email = prompt("Apna Gmail ID likhein jisse chats private save rahein:");
+      const email = prompt("Apna Gmail ID likhein jisse aapki chats private aur safe rahein:");
       if (email && email.includes('@')) {
         currentUser = {
           name: email.split('@')[0],
@@ -206,7 +222,7 @@
         title: 'New Conversation',
         messages: [{
           sender: 'bot',
-          text: '👋 Namaste! Main aapka Nexus AI Builder hoon. Apna naya idea ya feature batayein!'
+          text: '👋 Namaste! Main aapka Nexus AI Builder Pro hoon. Mujhe apna idea batayein, photo upload karein ya coding/business par research karein!'
         }]
       };
       sessions.unshift(newSession);
@@ -252,7 +268,7 @@
       const box = document.getElementById('chatBox');
       box.innerHTML = '';
       if (session) {
-        session.messages.forEach(msg => appendMessageUI(msg.text, msg.sender));
+        session.messages.forEach((msg, index) => appendMessageUI(msg.text, msg.sender, index, msg.image));
       }
     }
 
@@ -285,11 +301,59 @@
       }
     }
 
+    function handleFileSelect(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const fullBase64 = e.target.result;
+        currentAttachedMime = file.type;
+        currentAttachedBase64 = fullBase64.split(',')[1];
+        document.getElementById('previewImg').src = fullBase64;
+        document.getElementById('attachmentPreview').classList.remove('hidden');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function removeAttachment() {
+      currentAttachedBase64 = null;
+      currentAttachedMime = null;
+      document.getElementById('attachmentPreview').classList.add('hidden');
+      document.getElementById('mediaUpload').value = '';
+    }
+
+    function editMessage(index) {
+      const activeSession = sessions.find(s => s.id === currentSessionId);
+      if (!activeSession) return;
+      const msg = activeSession.messages[index];
+      if (msg && msg.sender === 'user') {
+        document.getElementById('userInput').value = msg.text;
+        activeSession.messages.splice(index);
+        saveSessions();
+        loadSession(currentSessionId);
+        document.getElementById('userInput').focus();
+      }
+    }
+
+    async function setStatusMessage(text) {
+      const tracker = document.getElementById('statusTracker');
+      const label = document.getElementById('statusText');
+      tracker.classList.remove('hidden');
+      label.innerText = text;
+    }
+
+    function hideStatus() {
+      document.getElementById('statusTracker').classList.add('hidden');
+    }
+
     async function sendMessage() {
       const input = document.getElementById('userInput');
       const sendBtn = document.getElementById('sendBtn');
       const text = input.value.trim();
-      if (!text) return;
+      const attachedImg = currentAttachedBase64;
+      const attachedMime = currentAttachedMime;
+
+      if (!text && !attachedImg) return;
 
       if (!geminiKey) {
         alert("Pehle API Key set karein!");
@@ -300,24 +364,61 @@
       if (!activeSession) return;
 
       if (activeSession.messages.filter(m => m.sender === 'user').length === 0) {
-        activeSession.title = text.length > 25 ? text.substring(0, 25) + '...' : text;
+        activeSession.title = (text || "Image Query").length > 25 ? (text || "Image Query").substring(0, 25) + '...' : (text || "Image Query");
         renderSidebar();
       }
 
-      activeSession.messages.push({ sender: 'user', text: text });
-      appendMessageUI(text, 'user');
+      // Add user message with image memory
+      const userMsgObj = { sender: 'user', text: text || '[Sent Image]' };
+      if (attachedImg) {
+        userMsgObj.image = `data:${attachedMime};base64,${attachedImg}`;
+      }
+      activeSession.messages.push(userMsgObj);
+      appendMessageUI(userMsgObj.text, 'user', activeSession.messages.length - 1, userMsgObj.image);
+
       input.value = '';
+      removeAttachment();
       sendBtn.disabled = true;
       sendBtn.innerText = '...';
 
-      const systemPrompt = `You are Nexus AI Builder Pro. 
-Communicate naturally in Hinglish/Hindi.
-RULES:
-1. Agar user ka prompt incomplete ya vague ho, toh code dene se pehle 2-3 zaroori sawal puchein (design, theme, features ke baare mein).
-2. Jab code provide karein, toh explanation ke andar clear step-by-step guidance dein (jaise GitHub par file kaise save karein, Vercel link waghera).
-3. Code ko hamesha single-file HTML/CSS/JS block ke andar \`\`\`html ... \`\`\` format mein rakhein taaki user One-Click copy aur sandbox use kar sake.`;
+      // Animated multi-step status indicator
+      setStatusMessage("Reading request & analyzing intent...");
+      setTimeout(() => setStatusMessage("Analyzing multimodal context & structure..."), 600);
+      setTimeout(() => setStatusMessage("Designing clean architecture & logic..."), 1300);
 
-      const targetModels = ['gemini-3.8-flash', 'gemini-3.5-flash-lite'];
+      const systemInstruction = `You are Nexus AI Builder Pro, an elite software architect and AI developer.
+Your expertise spans: HTML5, CSS3, Modern Tailwind CSS, JavaScript (ES6+), Python, React, Node.js, API Architecture, Business Planning, and UI/UX.
+
+BEHAVIOR RULES:
+1. EXCELLENT COMMUNICATOR & RESEARCHER: Explain clearly in natural Hinglish/Hindi. If user asks for business, research, or complex tools, break it down step-by-step.
+2. NO WATERMARKS & PROFESSIONAL DESIGN: Always provide clean, highly polished modern UI (glassmorphism/sleek dark/modern SaaS designs) without generic placeholders or watermarks.
+3. CODE FORMAT: When providing web apps, tools or code, ALWAYS wrap the runnable, standalone single-file code strictly in \`\`\`html ... \`\`\` so the user can run it live and copy it with 1 click.
+4. ROADMAP: Always conclude your response with a clear "Next Steps / Deployment Guide" telling the user where to paste the code, how to push to GitHub, or how to test.`;
+
+      // Build Multi-turn Memory Payload
+      const contentsPayload = [];
+      const historyContext = activeSession.messages.slice(-8); // Keep last 8 messages for sharp memory
+
+      historyContext.forEach(m => {
+        const parts = [{ text: (m.sender === 'user' ? "User: " : "Model: ") + m.text }];
+        if (m.sender === 'user' && m.image) {
+          const partsArr = m.image.split(',');
+          const mime = partsArr[0].match(/:(.*?);/)[1];
+          parts.push({
+            inline_data: {
+              mime_type: mime,
+              data: partsArr[1]
+            }
+          });
+        }
+        contentsPayload.push({
+          role: m.sender === 'user' ? 'user' : 'model',
+          parts: parts
+        });
+      });
+
+      // Target Google Gemini Models
+      const targetModels = ['gemini-3.8-flash', 'gemini-3.5-flash-lite', 'gemini-3.7-flash'];
       let done = false;
 
       for (const m of targetModels) {
@@ -326,9 +427,8 @@ RULES:
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              contents: [{
-                parts: [{ text: systemPrompt + "\n\nUser: " + text }]
-              }]
+              system_instruction: { parts: [{ text: systemInstruction }] },
+              contents: contentsPayload
             })
           });
 
@@ -337,7 +437,7 @@ RULES:
             const botReply = data.candidates[0].content.parts[0].text;
             activeSession.messages.push({ sender: 'bot', text: botReply });
             saveSessions();
-            appendMessageUI(botReply, 'bot');
+            appendMessageUI(botReply, 'bot', activeSession.messages.length - 1);
             extractAndAutoFillCode(botReply);
             done = true;
             break;
@@ -347,28 +447,54 @@ RULES:
         }
       }
 
+      hideStatus();
+
       if (!done) {
-        const errorMsg = "Google server par load hai. Kripya thodi der baad dubara try karein.";
+        const errorMsg = "Google server par abhi traffic spike hai. Kripya 15-20 second baad dubara Send karein.";
         activeSession.messages.push({ sender: 'bot', text: errorMsg });
         saveSessions();
-        appendMessageUI(errorMsg, 'bot');
+        appendMessageUI(errorMsg, 'bot', activeSession.messages.length - 1);
       }
 
       sendBtn.disabled = false;
       sendBtn.innerText = 'Send';
     }
 
-    function appendMessageUI(content, sender) {
+    function appendMessageUI(content, sender, index, imageUri) {
       const box = document.getElementById('chatBox');
       const div = document.createElement('div');
       div.className = sender === 'user' 
-        ? "ml-auto p-3 rounded-xl bg-blue-600 text-white text-sm max-w-[85%]" 
+        ? "ml-auto p-3 rounded-xl bg-blue-600 text-white text-sm max-w-[85%] space-y-2 relative group" 
         : "p-3 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 text-sm max-w-[90%] space-y-2";
 
+      if (imageUri) {
+        const img = document.createElement('img');
+        img.src = imageUri;
+        img.className = "max-h-48 rounded-lg border border-white/20 mb-1 object-cover";
+        div.appendChild(img);
+      }
+
       if (sender === 'user') {
-        div.innerText = content;
+        const textP = document.createElement('p');
+        textP.className = "whitespace-pre-wrap leading-relaxed";
+        textP.innerText = content;
+        div.appendChild(textP);
+
+        // Edit and Copy Controls for User Messages
+        const actionRow = document.createElement('div');
+        actionRow.className = "flex justify-end gap-2 pt-1 border-t border-white/20 text-[11px] opacity-80 group-hover:opacity-100 transition";
+        actionRow.innerHTML = `
+          <button onclick="navigator.clipboard.writeText('${content.replace(/'/g, "\\'")}'); alert('Copied!');" class="hover:underline flex items-center gap-1">
+            <i class="fa-regular fa-copy"></i> Copy
+          </button>
+          <button onclick="editMessage(${index})" class="hover:underline flex items-center gap-1">
+            <i class="fa-solid fa-pen"></i> Edit
+          </button>
+        `;
+        div.appendChild(actionRow);
+
       } else {
-        // Parse code blocks with Copy Button
+        // Structured Code Block & Explanations with One-Click Copy
         const parts = content.split(/(```[\s\S]*?```)/g);
         parts.forEach(part => {
           if (part.startsWith('```')) {
@@ -378,16 +504,16 @@ RULES:
 
             const topBar = document.createElement('div');
             topBar.className = "flex justify-between items-center px-3 py-1.5 bg-slate-800/80 text-[11px] text-slate-400";
-            topBar.innerHTML = `<span>Code</span>`;
+            topBar.innerHTML = `<span>Production Code</span>`;
 
             const copyBtn = document.createElement('button');
-            copyBtn.className = "bg-slate-700 hover:bg-slate-600 text-slate-200 px-2 py-0.5 rounded flex items-center gap-1 text-[11px]";
-            copyBtn.innerHTML = `<i class="fa-regular fa-copy"></i> Copy`;
+            copyBtn.className = "bg-slate-700 hover:bg-slate-600 text-slate-200 px-2.5 py-0.5 rounded flex items-center gap-1 text-[11px] transition";
+            copyBtn.innerHTML = `<i class="fa-regular fa-copy"></i> Copy Code`;
             copyBtn.onclick = () => {
               navigator.clipboard.writeText(codeContent);
               copyBtn.innerHTML = `<i class="fa-solid fa-check text-emerald-400"></i> Copied!`;
               setTimeout(() => {
-                copyBtn.innerHTML = `<i class="fa-regular fa-copy"></i> Copy`;
+                copyBtn.innerHTML = `<i class="fa-regular fa-copy"></i> Copy Code`;
               }, 2000);
             };
 
