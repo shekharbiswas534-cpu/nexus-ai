@@ -23,7 +23,6 @@
 
     .font-mono-code { font-family: 'JetBrains Mono', monospace; }
 
-    /* Dangerous Spider Cyberpunk Wallpaper - Fully responsive across PC, Tablet & Mobile */
     .nexus-wallpaper-bg {
       position: fixed;
       inset: 0;
@@ -53,15 +52,10 @@
       -webkit-backdrop-filter: blur(20px);
       border: 1px solid rgba(56, 189, 248, 0.15);
     }
-
-    .glow-effect {
-      box-shadow: 0 0 35px rgba(56, 189, 248, 0.12);
-    }
   </style>
 </head>
 <body class="bg-slate-950 text-slate-100 flex flex-col h-screen font-sans relative selection:bg-sky-500 selection:text-white">
 
-  <!-- Spider Wallpaper Background Layer -->
   <div class="nexus-wallpaper-bg"></div>
 
   <!-- Header -->
@@ -75,30 +69,28 @@
           Nexus AI Builder Pro
         </span>
         <span class="text-[9px] px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/30 font-bold uppercase font-mono-code hidden sm:inline">
-          Omniscient Voice Core
+          Multi-Key Omniscient Core
         </span>
       </div>
     </div>
 
-    <!-- Actions, Voice Mute & Auth -->
+    <!-- Actions & Buttons -->
     <div class="flex items-center gap-2">
-      <!-- Voice Mute Toggle Button -->
-      <button onclick="toggleVoiceMute()" id="voiceMuteBtn" class="text-xs bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-slate-700 px-2.5 py-1.5 rounded-lg font-bold transition flex items-center gap-1 shadow" title="Voice Assistant Mute/Unmute">
+      <button onclick="toggleVoiceMute()" id="voiceMuteBtn" class="text-xs bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-slate-700 px-2.5 py-1.5 rounded-lg font-bold transition flex items-center gap-1 shadow">
         <i id="voiceIcon" class="fa-solid fa-volume-high"></i> <span id="voiceText" class="hidden md:inline">Voice: ON</span>
       </button>
       
-      <!-- Preview & Key -->
       <button onclick="openFullscreenModal()" class="text-xs bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-2.5 py-1.5 rounded-lg flex items-center gap-1 shadow transition">
         <i class="fa-solid fa-expand"></i> <span class="hidden sm:inline">Preview</span>
       </button>
-      <button onclick="setApiKey()" class="text-xs bg-slate-800 hover:bg-slate-700 px-2.5 py-1.5 rounded-lg border border-slate-700 font-mono-code">
-        🔑 Key
+
+      <button onclick="openMultiKeyModal()" class="text-xs bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold px-2.5 py-1.5 rounded-lg flex items-center gap-1 shadow transition font-mono-code">
+        🔑 Multi-Key
       </button>
       
-      <!-- Official Google Sign-In & User Profile -->
       <div id="authSection" class="flex items-center gap-1.5">
         <button id="loginPromptBtn" onclick="promptGoogleLogin()" class="text-xs bg-blue-600 hover:bg-blue-500 text-white px-2.5 py-1.5 rounded-lg font-medium flex items-center gap-1 transition shadow">
-          <i class="fa-brands fa-google"></i> Official Login
+          <i class="fa-brands fa-google"></i> Login
         </button>
         <div id="userProfile" class="hidden flex items-center gap-2 bg-slate-800 px-2 py-1 rounded-lg border border-slate-700">
           <img id="userAvatar" src="" class="w-6 h-6 rounded-full border border-blue-400">
@@ -114,7 +106,6 @@
   <!-- Main Container -->
   <div class="flex-1 flex overflow-hidden relative">
 
-    <!-- History Sidebar -->
     <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-64 glass-panel border-r border-slate-800 flex flex-col transform -translate-x-full transition-transform duration-200 ease-in-out md:relative md:translate-x-0">
       <div class="p-3 border-b border-slate-800 flex justify-between items-center">
         <button onclick="startNewChat()" class="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold py-2 px-3 rounded-lg shadow transition">
@@ -134,20 +125,16 @@
       </div>
     </aside>
 
-    <!-- Main Workspace -->
     <div class="flex-1 flex flex-col md:flex-row overflow-hidden w-full">
       
-      <!-- Chat Interface -->
       <div class="flex-1 flex flex-col h-1/2 md:h-full border-r border-slate-800 bg-slate-950/70 backdrop-blur-md">
         <div id="chatBox" class="flex-1 overflow-y-auto p-4 space-y-4"></div>
 
-        <!-- Dynamic Status Tracker -->
         <div id="statusTracker" class="hidden px-4 py-2 bg-slate-900/90 border-t border-slate-800 flex items-center gap-2 text-xs text-blue-400 font-mono-code">
           <i class="fa-solid fa-circle-notch fa-spin"></i>
           <span id="statusText">Omniscient deep research in progress...</span>
         </div>
 
-        <!-- Input Box & Image Attachment Preview -->
         <div class="p-3 bg-slate-900/90 border-t border-slate-800 backdrop-blur-md">
           <div id="attachmentPreview" class="hidden mb-2 relative inline-block">
             <img id="previewImg" class="h-16 w-16 object-cover rounded-lg border border-blue-500 shadow">
@@ -166,7 +153,6 @@
         </div>
       </div>
 
-      <!-- Sandbox Panel -->
       <div class="flex-1 flex flex-col h-1/2 md:h-full bg-slate-900/80 border-t md:border-t-0 border-slate-800 backdrop-blur-md">
         <div class="p-2 border-b border-slate-800 flex justify-between items-center bg-slate-950/80 px-3">
           <span class="text-xs font-semibold text-slate-400 uppercase tracking-wide font-mono-code">Live Code Sandbox</span>
@@ -185,7 +171,24 @@
     </div>
   </div>
 
-  <!-- Fullscreen Desktop Preview Modal -->
+  <!-- Multi-Key Vault Modal -->
+  <div id="multiKeyModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="glass-panel w-full max-w-md rounded-2xl p-5 space-y-4 border border-slate-700 shadow-2xl">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <h3 class="text-sm font-bold text-amber-400 font-mono-code flex items-center gap-2">
+          <i class="fa-solid fa-key"></i> Multi-Key Vault Manager
+        </h3>
+        <button onclick="closeMultiKeyModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <div class="space-y-3 text-xs font-mono-code">
+        <p class="text-slate-300">Apni multiple Gemini API Keys yahan comma (,) ya newline se separate karke daalein. Agar ek key fail hogi, Nexus automatically doosri key use karega!</p>
+        <textarea id="multiKeyInput" rows="4" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-100 outline-none resize-none" placeholder="AIzaSy..., AIzaSy..."></textarea>
+        <button onclick="saveMultiKeys()" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-2.5 rounded-xl transition shadow">Save Keys to Vault</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fullscreen Preview Modal -->
   <div id="fullscreenModal" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md hidden flex flex-col p-2 md:p-6">
     <div class="flex-1 bg-slate-900 border border-slate-700 rounded-2xl flex flex-col overflow-hidden shadow-2xl">
       <div class="bg-slate-800 px-4 py-2.5 border-b border-slate-700 flex justify-between items-center select-none">
@@ -206,7 +209,13 @@
   </div>
 
   <script>
-    let geminiKey = localStorage.getItem('GEMINI_KEY') || '';
+    let multiKeys = JSON.parse(localStorage.getItem('NEXUS_MULTI_KEYS') || '[]');
+    if (multiKeys.length === 0) {
+      const singleKey = localStorage.getItem('GEMINI_KEY');
+      if (singleKey) multiKeys = [singleKey];
+    }
+    let currentKeyIndex = 0;
+
     let currentUser = JSON.parse(localStorage.getItem('NEXUS_USER') || 'null');
     let sessions = [];
     let currentSessionId = null;
@@ -221,6 +230,42 @@
     function init() {
       renderAuthUI();
       loadUserSessions();
+    }
+
+    function openMultiKeyModal() {
+      document.getElementById('multiKeyModal').classList.remove('hidden');
+      document.getElementById('multiKeyInput').value = multiKeys.join(', ');
+    }
+
+    function closeMultiKeyModal() {
+      document.getElementById('multiKeyModal').classList.add('hidden');
+    }
+
+    function saveMultiKeys() {
+      const raw = document.getElementById('multiKeyInput').value;
+      multiKeys = raw.split(/[\n,]+/).map(k => k.trim()).filter(k => k.length > 5);
+      localStorage.setItem('NEXUS_MULTI_KEYS', JSON.stringify(multiKeys));
+      if (multiKeys.length > 0) localStorage.setItem('GEMINI_KEY', multiKeys[0]);
+      alert(`✅ Successfully saved ${multiKeys.length} API keys to vault!`);
+      closeMultiKeyModal();
+    }
+
+    function getActiveApiKey() {
+      if (multiKeys.length === 0) {
+        const fallback = prompt("Pehle Multi-Key Vault mein apni Gemini API Key daalein:");
+        if (fallback) {
+          multiKeys = [fallback.trim()];
+          localStorage.setItem('NEXUS_MULTI_KEYS', JSON.stringify(multiKeys));
+          return multiKeys[0];
+        }
+        return null;
+      }
+      return multiKeys[currentKeyIndex % multiKeys.length];
+    }
+
+    function rotateApiKey() {
+      currentKeyIndex++;
+      console.warn("Rotating to next API key in vault...");
     }
 
     function toggleVoiceMute() {
@@ -240,20 +285,16 @@
       }
     }
 
-    // ElevenLabs / Browser Speech Synthesis Engine (Sweet female assistant voice simulation)
     function speakText(text) {
       if (voiceMuted || !text) return;
       window.speechSynthesis.cancel();
-      // Clean markdown code blocks from speech
-      const cleanText = text.replace(/```[\s\S]*?```/g, ' Code block generated successfully. ').replace(/#{1,6}\s/g, '');
+      const cleanText = text.replace(/```[\s\S]*?```/g, ' Code generated successfully. ').replace(/#{1,6}\s/g, '');
       const utterance = new SpeechSynthesisUtterance(cleanText);
       utterance.rate = 1.05;
-      utterance.pitch = 1.2; // Feminine pleasant pitch
-      
+      utterance.pitch = 1.2;
       const voices = window.speechSynthesis.getVoices();
-      const femaleVoice = voices.find(v => v.name.includes('Google UK English Female') || v.name.includes('Microsoft Zira') || v.name.includes('female') || v.lang.includes('en'));
+      const femaleVoice = voices.find(v => v.name.includes('Google UK English Female') || v.name.includes('Microsoft Zira') || v.lang.includes('en'));
       if (femaleVoice) utterance.voice = femaleVoice;
-
       window.speechSynthesis.speak(utterance);
     }
 
@@ -272,7 +313,7 @@
     }
 
     function promptGoogleLogin() {
-      const email = prompt("Official Google Login - Apna Gmail ID likhein taaki aapki chats cloud par secure rahein aur kabhi remove na ho:");
+      const email = prompt("Official Google Login - Apna Gmail ID likhein taaki chats cloud par secure rahein aur cross-device sync ho sakein:");
       if (email && email.includes('@')) {
         currentUser = {
           name: email.split('@')[0],
@@ -282,7 +323,7 @@
         localStorage.setItem('NEXUS_USER', JSON.stringify(currentUser));
         renderAuthUI();
         loadUserSessions();
-        alert("✅ Official Login Successful: " + currentUser.email + "\nYour chats are now safely synced across devices!");
+        alert("✅ Official Login Successful: " + currentUser.email);
       }
     }
 
@@ -394,15 +435,6 @@
       }
     }
 
-    function setApiKey() {
-      const key = prompt("Apni Gemini API Key paste karein:", geminiKey);
-      if (key !== null) {
-        geminiKey = key.trim();
-        localStorage.setItem('GEMINI_KEY', geminiKey);
-        alert("API Key save ho gayi!");
-      }
-    }
-
     function handleFileSelect(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -457,10 +489,8 @@
 
       if (!text && !attachedImg) return;
 
-      if (!geminiKey) {
-        alert("Pehle API Key set karein!");
-        return;
-      }
+      const activeApiKey = getActiveApiKey();
+      if (!activeApiKey) return;
 
       const activeSession = sessions.find(s => s.id === currentSessionId);
       if (!activeSession) return;
@@ -486,12 +516,11 @@
       setTimeout(() => setStatusMessage("Synthesizing exhaustive background knowledge..."), 700);
 
       const systemInstruction = `You are Nexus AI Builder Pro, an elite omniscient assistant and senior software architect. 
-You know the user deeply, recognize them like ChatGPT, and maintain persistent memory across sessions.
+You know the user deeply, recognize them like ChatGPT, and maintain persistent memory.
 Operating Parameters:
-1. NO UNNECESSARY CODE: Do NOT start writing code for every normal conversation or research query. Only provide code or apps when the user explicitly asks for code or an application build. Otherwise, focus purely on deep, exhaustive, unlimited research, business strategies, and direct conversational answers.
-2. EXPERT RESEARCHER & ASSISTANT: Explain everything thoroughly, in depth, with zero limits or restrictions. Use natural Hinglish/Hindi as preferred by the user.
-3. CODE FORMAT: When code IS requested, wrap the standalone single-file code strictly in \`\`\`html ... \`\`\` so it can run instantly.
-4. VOICE-FRIENDLY & DESCRIPTIVE: Act like a real assistant describing what you are researching or writing.`;
+1. NO UNNECESSARY CODE: Do NOT start writing code for every normal conversation or research query. Only provide code or apps when the user explicitly asks for code or an application build. Otherwise, focus purely on deep, exhaustive, unlimited research and direct answers.
+2. EXPERT RESEARCHER: Explain everything thoroughly in depth with zero limits. Use natural Hinglish/Hindi as preferred.
+3. CODE FORMAT: When code IS requested, wrap the standalone single-file code strictly in \`\`\`html ... \`\`\` so it can run instantly.`;
 
       const contentsPayload = [];
       const historyContext = activeSession.messages.slice(-12);
@@ -514,37 +543,47 @@ Operating Parameters:
       const targetModels = ['gemini-3.8-flash', 'gemini-3.5-flash-lite', 'gemini-3.7-flash'];
       let done = false;
 
-      for (const m of targetModels) {
-        try {
-          const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${geminiKey}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              system_instruction: { parts: [{ text: systemInstruction }] },
-              contents: contentsPayload
-            })
-          });
+      for (let attempt = 0; attempt < multiKeys.length || attempt < 2; attempt++) {
+        const currentKey = getActiveApiKey();
+        if (!currentKey) break;
 
-          const data = await res.json();
-          if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
-            const botReply = data.candidates[0].content.parts[0].text;
-            activeSession.messages.push({ sender: 'bot', text: botReply });
-            saveSessions();
-            appendMessageUI(botReply, 'bot', activeSession.messages.length - 1);
-            speakText(botReply);
-            extractAndAutoFillCode(botReply);
-            done = true;
-            break;
+        for (const m of targetModels) {
+          try {
+            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${currentKey}`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                system_instruction: { parts: [{ text: systemInstruction }] },
+                contents: contentsPayload
+              })
+            });
+
+            const data = await res.json();
+            if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
+              const botReply = data.candidates[0].content.parts[0].text;
+              activeSession.messages.push({ sender: 'bot', text: botReply });
+              saveSessions();
+              appendMessageUI(botReply, 'bot', activeSession.messages.length - 1);
+              speakText(botReply);
+              extractAndAutoFillCode(botReply);
+              done = true;
+              break;
+            } else if (data.error) {
+              console.warn(`Key failed or rate limited, rotating key...`);
+              rotateApiKey();
+              break;
+            }
+          } catch (e) {
+            console.error(e);
           }
-        } catch (e) {
-          console.error(e);
         }
+        if (done) break;
       }
 
       hideStatus();
 
       if (!done) {
-        const errorMsg = "Google server par abhi traffic spike hai. Kripya 15 second baad dubara try karein.";
+        const errorMsg = "Sabhi API keys par traffic limit reach ho gayi hai. Kripya Multi-Key Vault mein naye keys add karein.";
         activeSession.messages.push({ sender: 'bot', text: errorMsg });
         saveSessions();
         appendMessageUI(errorMsg, 'bot', activeSession.messages.length - 1);
@@ -635,13 +674,18 @@ Operating Parameters:
       const match = text.match(/```html([\s\S]*?)```/i) || text.match(/```([\s\S]*?)```/);
       if (match && match[1]) {
         const cleanCode = match[1].trim();
-        document.getElementById('codeEditor').value = cleanCode;
-        runCode();
+        const editor = document.getElementById('codeEditor');
+        if (editor) {
+          editor.value = cleanCode;
+          runCode();
+        }
       }
     }
 
     function runCode() {
-      const code = document.getElementById('codeEditor':) || document.getElementById('codeEditor').value;
+      const editor = document.getElementById('codeEditor');
+      if (!editor) return;
+      const code = editor.value;
       const frame = document.getElementById('previewFrame').contentWindow.document;
       frame.open();
       frame.write(code);
@@ -649,15 +693,15 @@ Operating Parameters:
     }
 
     function openFullscreenModal() {
-      const code = document.getElementById('codeEditor').value;
-      if (!code) {
+      const editor = document.getElementById('codeEditor');
+      if (!editor || !editor.value) {
         alert("Pehle sandbox mein code generate ya paste karein!");
         return;
       }
       const modal = document.getElementById('fullscreenModal');
       const frame = document.getElementById('modalPreviewFrame').contentWindow.document;
       frame.open();
-      frame.write(code);
+      frame.write(editor.value);
       frame.close();
       modal.classList.remove('hidden');
     }
