@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Nexus AI Builder Pro | Fast Omniscient Core</title>
+  <title>Nexus AI Builder Pro | ElevenLabs Voice Core</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -18,7 +18,6 @@
       overflow-x: hidden;
     }
 
-    /* Dangerous Spider Cyberpunk Wallpaper - Pure Background Only */
     .nexus-wallpaper-bg {
       position: fixed;
       inset: 0;
@@ -58,7 +57,7 @@
           Nexus AI Builder Pro
         </span>
         <span class="text-[9px] px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/30 font-bold uppercase hidden sm:inline">
-          Lightning Core
+          ElevenLabs Voice Active
         </span>
       </div>
     </div>
@@ -68,8 +67,8 @@
         <i id="voiceIcon" class="fa-solid fa-volume-high"></i> <span id="voiceText" class="hidden md:inline">Voice: ON</span>
       </button>
       
-      <button onclick="openFullscreenModal()" class="text-xs bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-2.5 py-1.5 rounded-lg flex items-center gap-1 shadow transition">
-        <i class="fa-solid fa-expand"></i> <span class="hidden sm:inline">Preview</span>
+      <button onclick="openElevenLabsModal()" class="text-xs bg-purple-600 hover:bg-purple-500 text-white font-bold px-2.5 py-1.5 rounded-lg flex items-center gap-1 shadow transition">
+        🎙️ Voice Config
       </button>
 
       <button onclick="openMultiKeyModal()" class="text-xs bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold px-2.5 py-1.5 rounded-lg flex items-center gap-1 shadow transition">
@@ -135,7 +134,7 @@
               <i class="fa-solid fa-paperclip"></i>
               <input type="file" id="mediaUpload" accept="image/*" class="hidden" onchange="handleFileSelect(event)">
             </label>
-            <textarea id="userInput" rows="2" placeholder="Apna idea, sawal ya requirement likhein..." class="flex-1 bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-sm focus:outline-none focus:border-blue-500 resize-none"></textarea>
+            <textarea id="userInput" rows="2" placeholder="Apna idea, sawal, deep research topic ya requirement likhein..." class="flex-1 bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-sm focus:outline-none focus:border-blue-500 resize-none"></textarea>
             <button id="sendBtn" onclick="sendMessage()" class="bg-blue-600 hover:bg-blue-500 px-4 py-2.5 rounded-xl font-medium text-sm transition h-full flex items-center justify-center shadow">Send</button>
           </div>
         </div>
@@ -159,6 +158,29 @@
     </div>
   </div>
 
+  <!-- ElevenLabs Voice Config Modal -->
+  <div id="elevenLabsModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="glass-panel w-full max-w-md rounded-2xl p-5 space-y-4 border border-slate-700 shadow-2xl">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <h3 class="text-sm font-bold text-purple-400 flex items-center gap-2">
+          <i class="fa-solid fa-microphone-lines"></i> ElevenLabs Voice Config
+        </h3>
+        <button onclick="closeElevenLabsModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="text-slate-300 font-semibold">ElevenLabs API Key</label>
+          <input type="password" id="elevenKeyInput" placeholder="sk_..." class="w-full mt-1 bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-100 outline-none">
+        </div>
+        <div>
+          <label class="text-slate-300 font-semibold">Voice ID (Default: Rachel/Uta vibe)</label>
+          <input type="text" id="elevenVoiceIdInput" value="21m00Tcm4TlvDq8ikWAM" class="w-full mt-1 bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-100 outline-none">
+        </div>
+        <button onclick="saveElevenLabsConfig()" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-2.5 rounded-xl transition shadow">Save Voice Config</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Multi-Key Vault Modal -->
   <div id="multiKeyModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4">
     <div class="glass-panel w-full max-w-md rounded-2xl p-5 space-y-4 border border-slate-700 shadow-2xl">
@@ -169,7 +191,7 @@
         <button onclick="closeMultiKeyModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
       <div class="space-y-3 text-xs">
-        <p class="text-slate-300">Apni multiple Gemini API Keys comma (,) ya newline se separate karke daalein. Ek key fail hone par doosri automatic use hogi!</p>
+        <p class="text-slate-300">Apni multiple Gemini API Keys comma (,) ya newline se separate karke daalein.</p>
         <textarea id="multiKeyInput" rows="4" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-100 outline-none resize-none font-mono"></textarea>
         <button onclick="saveMultiKeys()" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-2.5 rounded-xl transition shadow">Save Keys to Vault</button>
       </div>
@@ -204,6 +226,9 @@
     }
     let currentKeyIndex = 0;
 
+    let elevenKey = localStorage.getItem('ELEVENLABS_KEY') || '';
+    let elevenVoiceId = localStorage.getItem('ELEVENLABS_VOICE_ID') || '21m00Tcm4TlvDq8ikWAM';
+
     let currentUser = JSON.parse(localStorage.getItem('NEXUS_USER') || 'null');
     let sessions = [];
     let currentSessionId = null;
@@ -220,6 +245,25 @@
       loadUserSessions();
     }
 
+    function openElevenLabsModal() {
+      document.getElementById('elevenLabsModal').classList.remove('hidden');
+      document.getElementById('elevenKeyInput').value = elevenKey;
+      document.getElementById('elevenVoiceIdInput').value = elevenVoiceId;
+    }
+
+    function closeElevenLabsModal() {
+      document.getElementById('elevenLabsModal').classList.add('hidden');
+    }
+
+    function saveElevenLabsConfig() {
+      elevenKey = document.getElementById('elevenKeyInput').value.trim();
+      elevenVoiceId = document.getElementById('elevenVoiceIdInput').value.trim() || '21m00Tcm4TlvDq8ikWAM';
+      localStorage.setItem('ELEVENLABS_KEY', elevenKey);
+      localStorage.setItem('ELEVENLABS_VOICE_ID', elevenVoiceId);
+      alert("✅ ElevenLabs Voice Config saved successfully!");
+      closeElevenLabsModal();
+    }
+
     function openMultiKeyModal() {
       document.getElementById('multiKeyModal').classList.remove('hidden');
       document.getElementById('multiKeyInput').value = multiKeys.join(', ');
@@ -234,13 +278,13 @@
       multiKeys = raw.split(/[\n,]+/).map(k => k.trim()).filter(k => k.length > 5);
       localStorage.setItem('NEXUS_MULTI_KEYS', JSON.stringify(multiKeys));
       if (multiKeys.length > 0) localStorage.setItem('GEMINI_KEY', multiKeys[0]);
-      alert(`✅ Successfully saved ${multiKeys.length} API keys to vault!`);
+      alert(`✅ Saved ${multiKeys.length} Gemini API keys!`);
       closeMultiKeyModal();
     }
 
     function getActiveApiKey() {
       if (multiKeys.length === 0) {
-        const fallback = prompt("Pehle Multi-Key Vault mein apni Gemini API Key daalein:");
+        const fallback = prompt("Pehle Multi-Key Vault mein Gemini API Key daalein:");
         if (fallback) {
           multiKeys = [fallback.trim()];
           localStorage.setItem('NEXUS_MULTI_KEYS', JSON.stringify(multiKeys));
@@ -264,7 +308,6 @@
         btn.className = "text-xs bg-slate-800 hover:bg-slate-700 text-rose-400 border border-slate-700 px-2.5 py-1.5 rounded-lg font-bold transition flex items-center gap-1 shadow";
         icon.className = "fa-solid fa-volume-xmark";
         text.innerText = "Voice: MUTE";
-        window.speechSynthesis.cancel();
       } else {
         btn.className = "text-xs bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-slate-700 px-2.5 py-1.5 rounded-lg font-bold transition flex items-center gap-1 shadow";
         icon.className = "fa-solid fa-volume-high";
@@ -272,17 +315,47 @@
       }
     }
 
-    function speakText(text) {
+    // ElevenLabs Text-to-Speech Streaming Audio Engine
+    async function speakText(text) {
       if (voiceMuted || !text) return;
-      window.speechSynthesis.cancel();
-      const cleanText = text.replace(/```[\s\S]*?```/g, ' Code generated. ').replace(/#{1,6}\s/g, '');
-      const utterance = new SpeechSynthesisUtterance(cleanText);
-      utterance.rate = 1.05;
-      utterance.pitch = 1.2;
-      const voices = window.speechSynthesis.getVoices();
-      const femaleVoice = voices.find(v => v.name.includes('Google UK English Female') || v.name.includes('Microsoft Zira') || v.lang.includes('en'));
-      if (femaleVoice) utterance.voice = femaleVoice;
-      window.speechSynthesis.speak(utterance);
+      const cleanText = text.replace(/```[\s\S]*?```/g, ' Code generated. ').replace(/#{1,6}\s/g, '').substring(0, 300); // limit length for audio speed
+      
+      if (!elevenKey) {
+        // Fallback to pleasant browser speech if eleven labs key not added yet
+        const utterance = new SpeechSynthesisUtterance(cleanText);
+        utterance.rate = 1.05;
+        utterance.pitch = 1.2;
+        window.speechSynthesis.speak(utterance);
+        return;
+      }
+
+      try {
+        const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${elevenVoiceId}`, {
+          method: 'POST',
+          headers: {
+            'xi-api-key': elevenKey,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            text: cleanText,
+            model_id: "eleven_multilingual_v2",
+            voice_settings: { stability: 0.5, similarity_boost: 0.8 }
+          })
+        });
+
+        if (res.ok) {
+          const blob = await res.blob();
+          const audioUrl = URL.createObjectURL(blob);
+          const audio = new Audio(audioUrl);
+          audio.play();
+        } else {
+          console.warn("ElevenLabs API error, falling back to browser voice");
+          const utterance = new SpeechSynthesisUtterance(cleanText);
+          window.speechSynthesis.speak(utterance);
+        }
+      } catch (err) {
+        console.error(err);
+      }
     }
 
     function renderAuthUI() {
@@ -346,8 +419,8 @@
     function startNewChat() {
       const newId = 'session_' + Date.now();
       const greeting = currentUser 
-        ? `👋 Welcome back, ${currentUser.name}! Main aapka Nexus AI Builder Pro hoon. Aaj hum kis topic par research karein?` 
-        : `👋 Namaste Boss! Main aapka Nexus AI Builder Pro hoon. Batayein aaj kya help chahiye?`;
+        ? `Welcome back, ${currentUser.name}! Main aapka Nexus AI Builder Pro hoon. Aaj hum kis topic par research karein?` 
+        : `Namaste Boss! Main aapka Nexus AI Builder Pro hoon. Batayein aaj kya help chahiye?`;
       
       const newSession = {
         id: newId,
@@ -499,7 +572,7 @@
       sendBtn.disabled = true;
       sendBtn.innerText = '...';
 
-      setStatusMessage("Fast Nexus core responding...");
+      setStatusMessage("Nexus core thinking & researching...");
 
       const systemInstruction = `You are Nexus AI Builder Pro, a fast omniscient assistant. Recognize the user and maintain memory.
 Rules:
@@ -522,7 +595,6 @@ Rules:
         });
       });
 
-      // Lightning fast model priority
       const targetModels = ['gemini-3.5-flash-lite', 'gemini-3.8-flash', 'gemini-3.7-flash'];
       let done = false;
 
